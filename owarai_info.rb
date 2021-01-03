@@ -14,7 +14,7 @@ end
 def get_owarai_list
   info_list = []
 
-  url = 'https://tv.so-net.ne.jp/s/comedy'
+  url = 'https://www.tvkingdom.jp/schedulesBySearch.action?condition.genres%5B0%5D.parentId=105000&condition.genres%5B0%5D.childId=105103&stationPlatformId=1&condition.keyword=&submit=%E6%A4%9C%E7%B4%A2'
   doc = setup_doc(url)
   nodes = doc.xpath('//div[contains(@class, "utileList")][h2]')
 

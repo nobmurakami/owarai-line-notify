@@ -7,3 +7,5 @@ gem 'nokogiri'
 gem 'pry-byebug'
 
 gem 'slack-notifier'
+
+gem 'rubocop'

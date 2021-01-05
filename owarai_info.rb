@@ -11,10 +11,9 @@ def setup_doc(url)
   doc
 end
 
-def get_owarai_list
+def get_info_list(url)
   info_list = []
 
-  url = 'https://www.tvkingdom.jp/schedulesBySearch.action?condition.genres%5B0%5D.parentId=105000&condition.genres%5B0%5D.childId=105103&stationPlatformId=1&condition.keyword=&submit=%E6%A4%9C%E7%B4%A2'
   doc = setup_doc(url)
   nodes = doc.xpath('//div[contains(@class, "utileList")][h2]')
 
@@ -25,21 +24,30 @@ def get_owarai_list
     info += title + "\n"
 
     p = node.xpath('.//p').text
-    schedule = p.gsub(/バラエティー/, '').gsub(/\r\n/, '').gsub(/\n/, '').gsub(/          /, '').gsub(/  /, '').gsub(/  /, '').gsub(/  /, '')
+    schedule = p.gsub(/バラエティー/, '').gsub(/\r\n/, '').gsub(/\n/, '').gsub(/\s+/, "")
     info += schedule
 
-    date = schedule.split()[0]
+    date = schedule.split('(')[0]
+    hour = schedule.split(')')[1].split(':')[0].to_i
     today = Date.today
     m = today.month
     d = today.day
     str_today = "#{m.to_s}/#{d.to_s}"
+    str_tomorrow = "#{m.to_s}/#{(d + 1).to_s}"
 
-    if date == str_today
+    if date == str_today || (date == str_tomorrow && hour < 7)
       info_list << info
     end
   end
 
   return info_list
+end
+
+def get_owarai_list
+  url1 = 'https://www.tvkingdom.jp/schedulesBySearch.action?condition.genres%5B0%5D.parentId=105000&condition.genres%5B0%5D.childId=105103&stationPlatformId=1&condition.keyword=&submit=%E6%A4%9C%E7%B4%A2'
+  url2 = 'https://www.tvkingdom.jp/s/comedy'
+  merge_list = get_info_list(url1) | get_info_list(url2)
+  return merge_list
 end
 
 owarai_list = get_owarai_list

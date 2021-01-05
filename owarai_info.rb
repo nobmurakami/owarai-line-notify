@@ -1,14 +1,14 @@
+# frozen_string_literal: true
+
 require 'nokogiri'
 require 'open-uri'
-require "date"
+require 'date'
 require 'pry'
 
 def setup_doc(url)
   charset = 'utf-8'
-  html = open(url) { |f| f.read }
-  doc = Nokogiri::HTML.parse(html, nil, charset)
-  # doc.search('br').each { |n| n.replace("\n") }
-  doc
+  html = open(url, &:read)
+  Nokogiri::HTML.parse(html, nil, charset)
 end
 
 def get_info_list(url)
@@ -18,13 +18,13 @@ def get_info_list(url)
   nodes = doc.xpath('//div[contains(@class, "utileList")][h2]')
 
   nodes.each do |node|
-    info = ""
+    info = ''
 
     title = node.xpath('.//h2/a').text
-    info += title + "\n"
+    info += "#{title}\n"
 
     p = node.xpath('.//p').text
-    schedule = p.gsub(/バラエティー/, '').gsub(/\r\n/, '').gsub(/\n/, '').gsub(/\s+/, "")
+    schedule = p.gsub(/バラエティー/, '').gsub(/\r\n/, '').gsub(/\n/, '').gsub(/\s+/, '')
     info += schedule
 
     date = schedule.split('(')[0]
@@ -32,22 +32,19 @@ def get_info_list(url)
     today = Date.today
     m = today.month
     d = today.day
-    str_today = "#{m.to_s}/#{d.to_s}"
-    str_tomorrow = "#{m.to_s}/#{(d + 1).to_s}"
+    str_today = "#{m}/#{d}"
+    str_tomorrow = "#{m}/#{d + 1}"
 
-    if date == str_today || (date == str_tomorrow && hour < 7)
-      info_list << info
-    end
+    info_list << info if date == str_today || (date == str_tomorrow && hour < 7)
   end
 
-  return info_list
+  info_list
 end
 
 def get_owarai_list
   url1 = 'https://www.tvkingdom.jp/schedulesBySearch.action?condition.genres%5B0%5D.parentId=105000&condition.genres%5B0%5D.childId=105103&stationPlatformId=1&condition.keyword=&submit=%E6%A4%9C%E7%B4%A2'
   url2 = 'https://www.tvkingdom.jp/s/comedy'
-  merge_list = get_info_list(url1) | get_info_list(url2)
-  return merge_list
+  get_info_list(url1) | get_info_list(url2)
 end
 
 owarai_list = get_owarai_list
@@ -56,7 +53,6 @@ owarai_list.each do |li|
   if li == owarai_list[-1]
     puts li
   else
-    puts li + "\n\n"
+    puts "#{li}\n\n"
   end
 end
-

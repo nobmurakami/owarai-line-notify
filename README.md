@@ -1,1 +1,1 @@
-# owarai-line-notify
+# お笑い番組をLINEに通知するアプリ
